@@ -2,11 +2,9 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use sha2::{Sha256, Digest};
 use hex;
-use rsa::{RsaPrivateKey, RsaPublicKey};
 use rsa::pkcs1v15::{SigningKey, VerifyingKey, Signature as Pkcs1v15Signature};
 use rsa::signature::{Verifier, RandomizedSigner, SignatureEncoding};
-use rsa::pkcs8::DecodePublicKey;
-use base64;
+use base64::{Engine as _, engine::general_purpose};
 use rand::rngs::OsRng;
 
 use super::keys::{load_private_key, load_public_key}; 
@@ -51,7 +49,7 @@ pub fn digitally_sign(input_file_path: &str) -> Result<String, String> {
         .to_bytes()
         .to_vec();
 
-    let signature_base64 = base64::encode(&signature_bytes);
+    let signature_base64 = general_purpose::STANDARD.encode(&signature_bytes);
     let signature_path = PathBuf::from("./digital_signature.txt");
 
     fs::write(&signature_path, &signature_base64)
@@ -68,7 +66,7 @@ pub fn verify_signature(file_path: &str, signature_path: &str) -> Result<bool, S
     let signature_base64 = fs::read_to_string(signature_path)
         .map_err(|e| format!("Error reading signature file: {}", e))?;
     
-    let signature_bytes = base64::decode(signature_base64.trim())
+    let signature_bytes = general_purpose::STANDARD.decode(signature_base64.trim())
         .map_err(|_| "Error decoding signature from Base64 format".to_string())?;
 
     let signature = Pkcs1v15Signature::try_from(signature_bytes.as_slice())
