@@ -6,53 +6,70 @@ use rand::{rngs::OsRng, RngCore};
 use sha2::Sha256;
 use super::keys::{load_secret_key, load_public_key, load_private_key};
 use aes_gcm::aead::Aead;
+use tauri::AppHandle;
+use std::path::PathBuf;
+use tauri::Manager;
 
+pub fn symmetric_encrypt(app_handle: &AppHandle, input_path: String, output_path: String) -> Result<String, String> {
+    let base_path = app_handle
+        .path()
+        .resolve("keys", tauri::path::BaseDirectory::AppData)
+        .map_err(|e| format!("Cannot determine keys directory: {}", e))?;
 
-pub fn symmetric_encrypt(input_path: &str, output_path: &str) -> Result<String, String> {
+    let mut key_path = base_path.clone();
+    key_path.push("secret_key.txt");
+
+    let key = load_secret_key(key_path.to_str().unwrap())?;
+
     let plaintext = fs::read(input_path)
         .map_err(|e| format!("Error reading input file: {}", e))?;
-    let key = load_secret_key("./keys/secret_key.txt")?;
-    
+
     let cipher = Aes256Gcm::new(&key);
     let mut rng = OsRng;
-    
+
     let mut nonce_bytes = [0u8; 12];
     rng.fill_bytes(&mut nonce_bytes);
     let nonce = Nonce::from_slice(&nonce_bytes);
 
-    let ciphertext_with_tag = cipher.encrypt(
-        nonce, 
-        plaintext.as_ref()
-    )
-    .map_err(|_| "Symmetric encryption failed (Internal error)".to_string())?;
+    let ciphertext_with_tag = cipher.encrypt(nonce, plaintext.as_ref())
+        .map_err(|_| "Symmetric encryption failed".to_string())?;
 
     let mut output_data = Vec::with_capacity(nonce.len() + ciphertext_with_tag.len());
     output_data.extend_from_slice(nonce.as_slice());
     output_data.extend(ciphertext_with_tag);
 
-    fs::write(output_path, output_data)
+    fs::write(&output_path, output_data)
         .map_err(|e| format!("Error writing output file: {}", e))?;
 
     Ok(format!("Symmetric encryption completed. Data saved to: {}", output_path))
 }
 
-pub fn symmetric_decrypt(input_path: &str, output_path: &str) -> Result<String, String> {
+pub fn symmetric_decrypt(app_handle: &AppHandle, input_path: &str, output_path: &str) -> Result<String, String> {
+    let base_path = app_handle
+        .path()
+        .resolve("keys", tauri::path::BaseDirectory::AppData)
+        .map_err(|e| format!("Cannot determine keys directory: {}", e))?;
+
+    let mut key_path = base_path.clone();
+    key_path.push("secret_key.txt");
+
+    let key = load_secret_key(key_path.to_str().unwrap())?;
+
     let encrypted_data = fs::read(input_path)
         .map_err(|e| format!("Error reading input file: {}", e))?;
-    let key = load_secret_key("./keys/secret_key.txt")?;
 
     const NONCE_LEN: usize = 12;
     if encrypted_data.len() < NONCE_LEN {
-        return Err("Encrypted file is too short/corrupted.".to_string());
+        return Err("Encrypted file is too short or corrupted.".to_string());
     }
-    
+
     let (nonce_slice, ciphertext_with_tag) = encrypted_data.split_at(NONCE_LEN);
     let nonce = Nonce::from_slice(nonce_slice);
 
     let cipher = Aes256Gcm::new(&key);
 
     let decrypted_data = cipher.decrypt(nonce, ciphertext_with_tag.as_ref())
-        .map_err(|_| "Symmetric decryption FAILED. Key/data is incorrect or file is tampered.".to_string())?;
+        .map_err(|_| "Symmetric decryption failed. Key/data is incorrect or file is tampered.".to_string())?;
 
     fs::write(output_path, decrypted_data)
         .map_err(|e| format!("Error writing output file: {}", e))?;
