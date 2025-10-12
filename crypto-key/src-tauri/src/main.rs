@@ -36,13 +36,13 @@ fn symmetric_decrypt(app_handle: tauri::AppHandle, input_path: String, output_pa
 }
 
 #[tauri::command]
-fn asymmetric_encrypt(input_path: String, output_path: String) -> Result<String, String> {
-    crypting::asymmetric_encrypt(&input_path, &output_path)
+fn asymmetric_encrypt(app_handle: tauri::AppHandle, input_path: String, output_path: String) -> Result<String, String> {
+    crypting::asymmetric_encrypt(&app_handle, &input_path, &output_path)
 }
 
 #[tauri::command]
-fn asymmetric_decrypt(input_path: String, output_path: String) -> Result<String, String> {
-    crypting::asymmetric_decrypt(&input_path, &output_path)
+fn asymmetric_decrypt(app_handle: tauri::AppHandle, input_path: String, output_path: String) -> Result<String, String> {
+    crypting::asymmetric_decrypt(&app_handle, &input_path, &output_path)
 }
 
 fn main() {

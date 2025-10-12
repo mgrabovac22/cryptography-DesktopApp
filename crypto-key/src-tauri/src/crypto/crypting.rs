@@ -1,9 +1,11 @@
 use std::fs;
 use aes_gcm::{Aes256Gcm, KeyInit, Nonce};
-use rsa::{PublicKey, RsaPrivateKey, Oaep};
+use rsa::{PublicKey, RsaPrivateKey};
 use rsa::PaddingScheme;
 use rand::{rngs::OsRng, RngCore};
 use sha2::Sha256;
+use rsa::Oaep;
+use rsa::traits::Decryptor;
 use super::keys::{load_secret_key, load_public_key, load_private_key};
 use aes_gcm::aead::Aead;
 use tauri::AppHandle;
@@ -77,13 +79,25 @@ pub fn symmetric_decrypt(app_handle: &AppHandle, input_path: &str, output_path: 
     Ok(format!("Symmetric decryption completed. Data saved to: {}", output_path))
 }
 
-pub fn asymmetric_encrypt(input_path: &str, output_path: &str) -> Result<String, String> {
+pub fn asymmetric_encrypt(app_handle: &tauri::AppHandle, input_path: &str, output_path: &str) -> Result<String, String> {
+    let app_data_dir = app_handle.path().app_data_dir()
+        .map_err(|e| format!("Cannot determine keys directory: {}", e))?;
+
+    let public_key_path = app_data_dir
+        .join("keys")
+        .join("public_key.txt");
+
+    let public_key_path_str = public_key_path
+        .to_str()
+        .ok_or_else(|| "Invalid key path string".to_string())?;
+        
     let plaintext = std::fs::read(input_path)
         .map_err(|e| format!("Error reading input file: {}", e))?;
-    let public_key = load_public_key("./keys/public_key.txt")?;
+    
+    let public_key = load_public_key(public_key_path_str)?;
 
     let mut rng = OsRng;
-    let padding = rsa::Oaep::new::<Sha256>();
+    let padding = Oaep::new::<Sha256>();
 
     let ciphertext = public_key.encrypt(&mut rng, padding, &plaintext)
         .map_err(|e| format!("Encryption failed: {}", e))?;
@@ -94,13 +108,28 @@ pub fn asymmetric_encrypt(input_path: &str, output_path: &str) -> Result<String,
     Ok(format!("Asymmetric encryption done. Saved to {}", output_path))
 }
 
-pub fn asymmetric_decrypt(input_path: &str, output_path: &str) -> Result<String, String> {
+
+pub fn asymmetric_decrypt(app_handle: &tauri::AppHandle, input_path: &str, output_path: &str) -> Result<String, String> {
+    let app_data_dir = app_handle.path().app_data_dir()
+        .map_err(|e| format!("Cannot determine keys directory: {}", e))?;
+
+    let private_key_path = app_data_dir
+        .join("keys")
+        .join("private_key.txt");
+
+    let private_key_path_str = private_key_path
+        .to_str()
+        .ok_or_else(|| "Invalid key path string".to_string())?;
+        
     let ciphertext = fs::read(input_path)
         .map_err(|e| format!("Error reading input file: {}", e))?;
-    let private_key = load_private_key("./keys/private_key.txt")?;
+    
+    let private_key = load_private_key(private_key_path_str)?;
+
+    let padding = Oaep::new::<Sha256>();
 
     let decrypted_data = private_key.decrypt(
-        rsa::Oaep::new::<Sha256>(),
+        padding,
         ciphertext.as_ref()
     )
     .map_err(|e| format!("Asymmetric decryption failed. Private key/data is incorrect: {}", e))?;
