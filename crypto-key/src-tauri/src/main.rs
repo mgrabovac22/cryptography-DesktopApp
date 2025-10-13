@@ -45,6 +45,11 @@ fn asymmetric_decrypt(app_handle: tauri::AppHandle, input_path: String, output_p
     crypting::asymmetric_decrypt(&app_handle, &input_path, &output_path)
 }
 
+#[tauri::command]
+fn list_signatures_cmd(app_handle: tauri::AppHandle) -> Result<Vec<String>, String> {
+    crate::crypto::signature::list_signatures(&app_handle)
+}
+
 fn main() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
@@ -56,6 +61,7 @@ fn main() {
             symmetric_decrypt,
             asymmetric_encrypt,
             asymmetric_decrypt,
+            list_signatures_cmd
         ])
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
