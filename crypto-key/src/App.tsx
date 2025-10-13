@@ -132,7 +132,7 @@ const App = () => {
     if (!inputPath) return handleError('Odaberite datoteku za digest.');
     setResultMessage('Izračunavanje digest-a...');
     try {
-      const res = await invoke<string>('calculate_digest_and_save', { path: inputPath });
+      const res = await invoke<string>('calculate_digest_and_save', { inputPath });
       handleResult(res);
     } catch (err) {
       handleError(err);

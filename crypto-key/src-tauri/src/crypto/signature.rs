@@ -6,6 +6,8 @@ use rsa::pkcs1v15::{SigningKey, VerifyingKey, Signature as Pkcs1v15Signature};
 use rsa::signature::{Verifier, RandomizedSigner, SignatureEncoding};
 use base64::{Engine as _, engine::general_purpose};
 use rand::rngs::OsRng;
+use tauri::Manager;
+use tauri::AppHandle;
 
 use super::keys::{load_private_key, load_public_key}; 
 
@@ -21,12 +23,16 @@ fn calculate_digest(path: &Path) -> Result<Vec<u8>, String> {
     Ok(hasher.finalize().to_vec()) 
 }
 
-pub fn calculate_digest_and_save(input_path: &str) -> Result<String, String> {
+pub fn calculate_digest_and_save(app_handle: &tauri::AppHandle, input_path: &str) -> Result<String, String> {
     let digest = calculate_digest(Path::new(input_path))?;
     
     let digest_hex = hex::encode(digest);
-    let digest_path = PathBuf::from("./digest.txt");
+    
+    let app_data_dir = app_handle.path().app_data_dir()
+        .map_err(|e| format!("Error reading app data directory: {}", e))?;
 
+    let digest_path = app_data_dir.join("digest.txt");
+    
     fs::write(&digest_path, digest_hex)
         .map_err(|e| format!("Error saving digest: {}", e))?;
 
@@ -34,8 +40,14 @@ pub fn calculate_digest_and_save(input_path: &str) -> Result<String, String> {
 }
 
 
-pub fn digitally_sign(input_file_path: &str) -> Result<String, String> {
-    let priv_key_path = PathBuf::from("./keys/private_key.txt");
+pub fn digitally_sign(app_handle: &tauri::AppHandle, input_file_path: &str) -> Result<String, String> {
+    
+    let app_data_dir = app_handle.path().app_data_dir()
+        .map_err(|e| format!("Error opening app data directory: {}", e))?;
+
+    let priv_key_path = app_data_dir.join("keys").join("private_key.txt");
+    let signature_path = app_data_dir.join("digital_signature.txt");
+    
     let private_key = load_private_key(priv_key_path.to_str().unwrap_or_default())?;
 
     let digest = calculate_digest(Path::new(input_file_path))?;
@@ -50,8 +62,7 @@ pub fn digitally_sign(input_file_path: &str) -> Result<String, String> {
         .to_vec();
 
     let signature_base64 = general_purpose::STANDARD.encode(&signature_bytes);
-    let signature_path = PathBuf::from("./digital_signature.txt");
-
+    
     fs::write(&signature_path, &signature_base64)
         .map_err(|e| format!("Error saving digital signature: {}", e))?;
 
@@ -59,8 +70,13 @@ pub fn digitally_sign(input_file_path: &str) -> Result<String, String> {
 }
 
 
-pub fn verify_signature(file_path: &str, signature_path: &str) -> Result<bool, String> {
-    let pub_key_path = PathBuf::from("./keys/public_key.txt");
+pub fn verify_signature(app_handle: &tauri::AppHandle, file_path: &str, signature_path: &str) -> Result<bool, String> {
+    
+    let app_data_dir = app_handle.path().app_data_dir()
+        .map_err(|e| format!("Error opening app data directory: {}", e))?;
+
+    let pub_key_path = app_data_dir.join("keys").join("public_key.txt");
+    
     let public_key = load_public_key(pub_key_path.to_str().unwrap_or_default())?;
 
     let signature_base64 = fs::read_to_string(signature_path)

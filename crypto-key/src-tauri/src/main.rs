@@ -11,18 +11,18 @@ fn generate_keys(app_handle: tauri::AppHandle) -> Result<String, String> {
 }
 
 #[tauri::command]
-fn calculate_digest_and_save(path: String) -> Result<String, String> {
-    signature::calculate_digest_and_save(&path) 
+fn calculate_digest_and_save(app_handle: tauri::AppHandle, input_path: String) -> Result<String, String> {
+    signature::calculate_digest_and_save(&app_handle, &input_path)
 }
 
 #[tauri::command]
-fn digitally_sign(file_path: String) -> Result<String, String> {
-    signature::digitally_sign(&file_path)
+fn digitally_sign(app_handle: tauri::AppHandle, file_path: String) -> Result<String, String> {
+    signature::digitally_sign(&app_handle, &file_path)
 }
 
 #[tauri::command]
-fn verify_signature(file_path: String, signature_path: String) -> Result<bool, String> {
-    signature::verify_signature(&file_path, &signature_path)
+fn verify_signature(app_handle: tauri::AppHandle, file_path: String, signature_path: String) -> Result<bool, String> {
+    signature::verify_signature(&app_handle, &file_path, &signature_path)
 }
 
 #[tauri::command]

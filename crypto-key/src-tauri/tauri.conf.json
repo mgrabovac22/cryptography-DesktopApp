@@ -12,9 +12,10 @@
   "app": {
     "windows": [
       {
+        "resizable": true,
         "title": "crypto-key",
-        "width": 800,
-        "height": 600
+        "width": 1280,
+        "height": 720
       }
     ],
     "security": {
