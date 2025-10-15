@@ -1,9 +1,9 @@
 use std::fs;
-use std::path::{Path, PathBuf};
+use std::path::{Path};
 use sha2::{Sha256, Digest};
 use hex;
-use rsa::pkcs1v15::{SigningKey, VerifyingKey, Signature as Pkcs1v15Signature};
-use rsa::signature::{Verifier, RandomizedSigner, SignatureEncoding};
+use rsa::pkcs1v15::{VerifyingKey, Signature as Pkcs1v15Signature};
+use rsa::signature::{Verifier, RandomizedSigner};
 use base64::{Engine as _, engine::general_purpose};
 use rand::rngs::OsRng;
 use tauri::Manager;

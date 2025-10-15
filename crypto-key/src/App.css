@@ -191,6 +191,7 @@ button {
   padding: 0.3rem 1rem;
   font-weight: 400;
   border: none;
+  border-radius: 12px;
   cursor: pointer;
   transition: all 0.25s ease;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);

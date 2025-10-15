@@ -2,7 +2,6 @@ use rsa::pkcs8::{EncodePrivateKey, EncodePublicKey, LineEnding, DecodePrivateKey
 use rsa::{RsaPrivateKey, RsaPublicKey};
 use rand::rngs::OsRng;
 use std::fs;
-use std::path::PathBuf;
 use aes_gcm::{KeyInit, Aes256Gcm, Key};
 use base64::{Engine as _, engine::general_purpose};
 use tauri::{AppHandle, Manager, path::BaseDirectory};

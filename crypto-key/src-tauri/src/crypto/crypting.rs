@@ -1,15 +1,12 @@
 use std::fs;
 use aes_gcm::{Aes256Gcm, KeyInit, Nonce};
-use rsa::{PublicKey, RsaPrivateKey};
-use rsa::PaddingScheme;
+use rsa::{PublicKey};
 use rand::{rngs::OsRng, RngCore};
 use sha2::Sha256;
 use rsa::Oaep;
-use rsa::traits::Decryptor;
 use super::keys::{load_secret_key, load_public_key, load_private_key};
 use aes_gcm::aead::Aead;
 use tauri::AppHandle;
-use std::path::PathBuf;
 use tauri::Manager;
 
 pub fn symmetric_encrypt(app_handle: &AppHandle, input_path: String, output_path: String) -> Result<String, String> {

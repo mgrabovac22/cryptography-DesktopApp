@@ -2,12 +2,9 @@ mod crypto;
 
 use crypto::{keys, signature, crypting};
 
-use tauri::Manager;
-use crate::crypto::keys::generate_and_save;
-
 #[tauri::command]
 fn generate_keys(app_handle: tauri::AppHandle) -> Result<String, String> {
-    generate_and_save(app_handle)
+    keys::generate_and_save(app_handle)
 }
 
 #[tauri::command]
