@@ -91,8 +91,9 @@ pub fn verify_signature(app_handle: &tauri::AppHandle, file_path: &str, signatur
     
     let public_key = load_public_key(pub_key_path.to_str().unwrap_or_default())?;
 
-    let signature_base64 = fs::read_to_string(signature_path)
-        .map_err(|e| format!("Error reading signature file: {}", e))?;
+    let sig_full_path = app_data_dir.join(signature_path);
+    let signature_base64 = fs::read_to_string(&sig_full_path)
+        .map_err(|e| format!("Error reading signature file ({}): {}", sig_full_path.display(), e))?;
     
     let signature_bytes = general_purpose::STANDARD.decode(signature_base64.trim())
         .map_err(|_| "Error decoding signature from Base64 format".to_string())?;

@@ -27,67 +27,69 @@ export const SignatureTab: React.FC<SignatureTabProps> = ({
         const result = await invoke<string[]>("list_signatures_cmd");
         setSignatures(result);
       } catch (err) {
-        console.error("Greška prilikom učitavanja potpisa:", err);
+        console.error("Error loading signatures:", err);
       }
     };
     fetchSignatures();
   }, []);
 
   const handleDigest = async () => {
-    if (!inputPath) return setResultMessage("Odaberite datoteku za digest.");
-    setResultMessage("Izračunavanje digest-a...");
+    if (!inputPath) return setResultMessage("Choose a file for digest.");
+    setResultMessage("Calculating digest...");
     try {
       const res = await invoke<string>("calculate_digest_and_save", { inputPath });
       setResultMessage(res);
     } catch (err: any) {
-      setResultMessage(`GREŠKA: ${err}`);
+      setResultMessage(`ERROR: ${err}`);
     }
   };
 
   const handleSign = async () => {
-    if (!inputPath) return setResultMessage("Odaberite datoteku za potpisivanje.");
-    setResultMessage("Digitalno potpisivanje...");
+    if (!inputPath) return setResultMessage("Choose a file for signing.");
+    setResultMessage("Signing...");
     try {
-      const res = await invoke<string>("digitally_sign", { inputFilePath: inputPath });
+      const res = await invoke<string>("digitally_sign", { filePath: inputPath });
       setResultMessage(res);
     } catch (err: any) {
-      setResultMessage(`GREŠKA: ${err}`);
+      setResultMessage(`ERROR: ${err}`);
     }
   };
 
   const handleVerify = async () => {
-    if (!inputPath) return setResultMessage("Odaberite datoteku za verifikaciju.");
+    if (!inputPath) return setResultMessage("Choose a file for verification.");
 
     let sigPath = signaturePath;
     if (!useCustomSignature) {
-      if (!selectedSignature) return setResultMessage("Odaberite digitalni potpis iz liste.");
+      if (!selectedSignature) return setResultMessage("Choose a digital signature from the list.");
       sigPath = `signature/${selectedSignature}`;
     }
 
-    setResultMessage("Verifikacija u tijeku...");
+    setResultMessage("Verification in progress...");
     try {
+      setResultMessage("sigPath: " + sigPath);
       const isValid = await invoke<boolean>("verify_signature", {
         filePath: inputPath,
         signaturePath: sigPath,
       });
+        
       setResultMessage(
         isValid
-          ? "✅ VERIFIKACIJA USPIJELA: Potpis je valjan!"
-          : "❌ VERIFIKACIJA PALA: Potpis nije valjan."
+          ? "✅ VERIFICATION SUCCESSFUL: The signature is valid!"
+          : "❌ VERIFICATION FAILED: The signature is invalid."
       );
     } catch (err: any) {
-      setResultMessage(`GREŠKA: ${err}`);
+      setResultMessage(`ERROR: ${err}`);
     }
   };
 
   return (
     <div className="space-y-6">
       <h2 className="text-xl font-semibold text-gray-800">
-        Digitalni Potpis (RSA PKCS#1 v1.5)
+        Digital Signature (RSA PKCS#1 v1.5)
       </h2>
 
       <FileInput
-        label="Datoteka za Potpis/Verifikaciju"
+        label="File for Signing/Verification"
         path={inputPath}
         setter={setInputPath}
         setResultMessage={setResultMessage}
@@ -102,21 +104,21 @@ export const SignatureTab: React.FC<SignatureTabProps> = ({
           className="w-4 h-4 accent-indigo-600"
         />
         <label htmlFor="customSig" className="text-sm font-medium text-gray-700">
-          Koristi vlastitu (custom) signature datoteku
+          Use custom signature file
         </label>
       </div>
 
       {!useCustomSignature ? (
         <div className="mt-3">
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Odaberi Signature iz AppData/signature/
+            Choose Signature from AppData/signature/
           </label>
           <select
             className="w-full border border-gray-300 rounded-lg p-2 bg-white shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
             value={selectedSignature}
             onChange={(e) => setSelectedSignature(e.target.value)}
           >
-            <option value="">-- Odaberi potpis --</option>
+            <option value="">-- Choose signature file --</option>
             {signatures.map((sig, i) => (
               <option key={i} value={sig}>
                 {sig}
@@ -126,7 +128,7 @@ export const SignatureTab: React.FC<SignatureTabProps> = ({
         </div>
       ) : (
         <FileInput
-          label="Custom Signature Datoteka (.txt)"
+          label="Custom Signature File (.txt)"
           path={signaturePath}
           setter={setSignaturePath}
           setResultMessage={setResultMessage}
@@ -138,19 +140,19 @@ export const SignatureTab: React.FC<SignatureTabProps> = ({
           onClick={handleDigest}
           className="py-3 text-md font-bold text-white bg-gray-500 rounded-xl shadow-lg hover:bg-gray-600"
         >
-          Izračunaj Digest (SHA256)
+          CALCULATE DIGEST (SHA256)
         </button>
         <button
           onClick={handleSign}
           className="py-3 text-md font-bold text-white bg-indigo-600 rounded-xl shadow-lg hover:bg-indigo-700"
         >
-          POTPIŠI (.txt)
+          SIGN (.txt)
         </button>
         <button
           onClick={handleVerify}
           className="py-3 text-md font-bold text-white bg-green-600 rounded-xl shadow-lg hover:bg-green-700"
         >
-          VERIFICIRAJ
+          VERIFY
         </button>
       </div>
     </div>

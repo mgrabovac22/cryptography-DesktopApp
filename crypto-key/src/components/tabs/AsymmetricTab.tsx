@@ -20,55 +20,55 @@ export const AsymmetricTab: React.FC<AsymmetricTabProps> = ({
   getOutputPath,
 }) => {
   const handleAsymmetricEncrypt = async () => {
-    if (!inputPath) return setResultMessage('Odaberite ulaznu datoteku.');
+    if (!inputPath) return setResultMessage('Choose input file.');
     const outPath = getOutputPath(inputPath, 'asym_enc');
-    setResultMessage('Asimetrična enkripcija u tijeku...');
+    setResultMessage('Asymmetric encryption in progress...');
     try {
       const res = await invoke<string>('asymmetric_encrypt', { inputPath, outputPath: outPath });
       setOutputPath(outPath);
       setResultMessage(res);
     } catch (err: any) {
-      setResultMessage(`GREŠKA: ${err}`);
+      setResultMessage(`ERROR: ${err}`);
     }
   };
 
   const handleAsymmetricDecrypt = async () => {
-    if (!inputPath) return setResultMessage('Odaberite ulaznu datoteku.');
+    if (!inputPath) return setResultMessage('Choose input file.');
     const outPath = getOutputPath(inputPath, 'asym_dec_out');
-    setResultMessage('Asimetrična dekripcija u tijeku...');
+    setResultMessage('Asymmetric decryption in progress...');
     try {
       const res = await invoke<string>('asymmetric_decrypt', { inputPath, outputPath: outPath });
       setOutputPath(outPath);
       setResultMessage(res);
     } catch (err: any) {
-      setResultMessage(`GREŠKA: ${err}`);
+      setResultMessage(`ERROR: ${err}`);
     }
   };
 
   return (
     <div className="space-y-6">
-      <h2 className="text-xl font-semibold text-gray-800">Asimetrična Enkripcija (RSA OAEP)</h2>
+      <h2 className="text-xl font-semibold text-gray-800">Asymmetric Encryption (RSA OAEP)</h2>
       <p className="text-sm text-yellow-700 bg-yellow-100 p-3 rounded-lg border border-yellow-300">
-        <span className="font-bold">Upozorenje:</span> RSA je primarno za male datoteke i razmjenu ključeva.
+        <span className="font-bold">Warning:</span> RSA is primarily for small files and key exchange.
       </p>
-      <FileInput label="Ulazna Datoteka" path={inputPath} setter={setInputPath} setResultMessage={setResultMessage} />
+      <FileInput label="Input File" path={inputPath} setter={setInputPath} setResultMessage={setResultMessage} />
       <div className="flex space-x-4">
         <button
           onClick={handleAsymmetricEncrypt}
           className="flex-1 py-3 text-lg font-bold text-white bg-purple-500 rounded-xl shadow-lg hover:bg-purple-600"
         >
-          ENKRIPTIRAJ (RSA)
+          ENCRYPT (RSA)
         </button>
         <button
           onClick={handleAsymmetricDecrypt}
           className="flex-1 py-3 text-lg font-bold text-purple-800 bg-purple-200 rounded-xl shadow-lg hover:bg-purple-300"
         >
-          DEKRIPTIRAJ (RSA)
+          DECRYPT (RSA)
         </button>
       </div>
       {outputPath && (
         <p className="text-sm text-gray-500 mt-2">
-          Izlazna datoteka: <span className="font-mono text-gray-700">{outputPath}</span>
+          Output file: <span className="font-mono text-gray-700">{outputPath}</span>
         </p>
       )}
     </div>

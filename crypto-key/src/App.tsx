@@ -6,6 +6,7 @@ import { SymmetricTab } from "./components/tabs/SymmetricTab";
 import { KeysTab } from "./components/tabs/KeysTab";
 import { AsymmetricTab } from "./components/tabs/AsymmetricTab";
 import { SignatureTab } from "./components/tabs/SignatureTab";
+import { StatusModal } from "./components/shared/StatusModal";
 
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'keys' | 'symmetric' | 'asymmetric' | 'signature'>('keys');
@@ -13,6 +14,13 @@ const App: React.FC = () => {
   const [inputPath, setInputPath] = useState("");
   const [outputPath, setOutputPath] = useState("");
   const [signaturePath, setSignaturePath] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
+
+  const showModalMessage = (msg: string) => {
+    setModalMessage(msg);
+    setIsModalOpen(true);
+  };
 
   const getOutputPath = (originalPath: string, suffix: string) => {
     if (!originalPath) return "output.bin";
@@ -25,62 +33,66 @@ const App: React.FC = () => {
     <div className="app-container">
       <Snowfall />
       <div className="crypto-card">
-        <h1 className="crypto-title">❄ Kriptografski Alat ❄</h1>
-        <p className="crypto-subtitle">Sigurnost podataka je u hladnim rukama!</p>
+        <h1 className="crypto-title">❄ CRYPTO KEY ❄</h1>
+        <p className="crypto-subtitle">Data security is cool!</p>
 
         <div className="tabs-container mb-6 flex w-full">
           <TabButton tabId="keys" activeTab={activeTab} setActiveTab={(id) => { setActiveTab(id); setResultMessage(''); }}>
-            Ključevi
+            Keys
           </TabButton>
           <TabButton tabId="symmetric" activeTab={activeTab} setActiveTab={(id) => { setActiveTab(id); setResultMessage(''); }}>
-            Simetrično
+            Symmetric
           </TabButton>
           <TabButton tabId="asymmetric" activeTab={activeTab} setActiveTab={(id) => { setActiveTab(id); setResultMessage(''); }}>
-            Asimetrično
+            Asymmetric
           </TabButton>
           <TabButton tabId="signature" activeTab={activeTab} setActiveTab={(id) => { setActiveTab(id); setResultMessage(''); }}>
-            Potpis
+            Signature
           </TabButton>
         </div>
 
         <div className="inner-box">
-          {activeTab === "keys" && <KeysTab setResultMessage={setResultMessage} />}
+          {activeTab === "keys" && <KeysTab setResultMessage={showModalMessage} />}
+
           {activeTab === "symmetric" && (
             <SymmetricTab
               inputPath={inputPath}
               setInputPath={setInputPath}
               outputPath={outputPath}
               setOutputPath={setOutputPath}
-              setResultMessage={setResultMessage}
+              setResultMessage={showModalMessage}
               getOutputPath={getOutputPath}
             />
           )}
+
           {activeTab === "asymmetric" && (
             <AsymmetricTab
               inputPath={inputPath}
               setInputPath={setInputPath}
               outputPath={outputPath}
               setOutputPath={setOutputPath}
-              setResultMessage={setResultMessage}
+              setResultMessage={showModalMessage}
               getOutputPath={getOutputPath}
             />
           )}
+
           {activeTab === "signature" && (
             <SignatureTab
               inputPath={inputPath}
               setInputPath={setInputPath}
               signaturePath={signaturePath}
               setSignaturePath={setSignaturePath}
-              setResultMessage={setResultMessage}
+              setResultMessage={showModalMessage}
             />
           )}
         </div>
-
-        <div className="status-box">
-          <h3 className="font-bold mb-1">Status/Rezultat:</h3>
-          <p>{resultMessage || "Čekam komandu..."}</p>
-        </div>
       </div>
+
+      <StatusModal
+          isOpen={isModalOpen}
+          message={modalMessage}
+          onClose={() => setIsModalOpen(false)}
+      />
     </div>
   );
 };

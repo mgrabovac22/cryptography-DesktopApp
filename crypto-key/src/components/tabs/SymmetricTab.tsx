@@ -20,52 +20,52 @@ export const SymmetricTab: React.FC<SymmetricTabProps> = ({
   getOutputPath,
 }) => {
   const handleSymmetricEncrypt = async () => {
-    if (!inputPath) return setResultMessage('Odaberite ulaznu datoteku.');
+    if (!inputPath) return setResultMessage('Choose input file.');
     const outPath = getOutputPath(inputPath, 'sym_enc');
-    setResultMessage('Simetrična enkripcija u tijeku...');
+    setResultMessage('Symmetric encryption in progress...');
     try {
       const res = await invoke<string>('symmetric_encrypt', { inputPath, outputPath: outPath });
       setOutputPath(outPath);
       setResultMessage(res);
     } catch (err: any) {
-      setResultMessage(`GREŠKA: ${err}`);
+      setResultMessage(`ERROR: ${err}`);
     }
   };
 
   const handleSymmetricDecrypt = async () => {
-    if (!inputPath) return setResultMessage('Odaberite ulaznu datoteku.');
+    if (!inputPath) return setResultMessage('Choose input file.');
     const outPath = getOutputPath(inputPath, 'sym_dec_out');
-    setResultMessage('Simetrična dekripcija u tijeku...');
+    setResultMessage('Symmetric decryption in progress...');
     try {
       const res = await invoke<string>('symmetric_decrypt', { inputPath, outputPath: outPath });
       setOutputPath(outPath);
       setResultMessage(res);
     } catch (err: any) {
-      setResultMessage(`GREŠKA: ${err}`);
+      setResultMessage(`ERROR: ${err}`);
     }
   };
 
   return (
     <div className="space-y-6">
-      <h2 className="text-xl font-semibold text-gray-800">Simetrična Enkripcija (AES-256 GCM)</h2>
-      <FileInput label="Ulazna Datoteka za Enkripciju/Dekripciju" path={inputPath} setter={setInputPath} setResultMessage={setResultMessage} />
+      <h2 className="text-xl font-semibold text-gray-800">Symmetric Encryption (AES-256 GCM)</h2>
+      <FileInput label="Input File for Encryption/Decryption" path={inputPath} setter={setInputPath} setResultMessage={setResultMessage} />
       <div className="flex space-x-4">
         <button
           onClick={handleSymmetricEncrypt}
           className="flex-1 py-3 text-lg font-bold text-white bg-blue-500 rounded-xl shadow-lg hover:bg-blue-600"
         >
-          ENKRIPTIRAJ (AES)
+          ENCRYPT (AES)
         </button>
         <button
           onClick={handleSymmetricDecrypt}
           className="flex-1 py-3 text-lg font-bold text-blue-800 bg-blue-200 rounded-xl shadow-lg hover:bg-blue-300"
         >
-          DEKRIPTIRAJ (AES)
+          DECRYPT (AES)
         </button>
       </div>
       {outputPath && (
         <p className="text-sm text-gray-500 mt-2">
-          Izlazna datoteka: <span className="font-mono text-gray-700">{outputPath}</span>
+          Output file: <span className="font-mono text-gray-700">{outputPath}</span>
         </p>
       )}
     </div>

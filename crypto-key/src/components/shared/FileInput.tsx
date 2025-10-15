@@ -16,7 +16,7 @@ export const FileInput: React.FC<FileInputProps> = ({ label, path, setter, setRe
         setter(Array.isArray(selected) ? selected[0] : selected);
       }
     } catch (err) {
-      setResultMessage(`GREŠKA: ${err}`);
+      setResultMessage(`ERROR: ${err}`);
     }
   };
 
@@ -27,14 +27,13 @@ export const FileInput: React.FC<FileInputProps> = ({ label, path, setter, setRe
         <input
           type="text"
           readOnly
-          value={path || 'Nije odabrano...'}
-          className="flex-grow p-2 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-150"
-        />
+          value={path || 'Not selected...'}
+          className="p-2 border border-gray-300 bg-gray-50 rounded-lg focus:ring-2 focus:ring-indigo-500" />
         <button
           onClick={selectFile}
           className="px-4 py-2 text-sm font-semibold text-white bg-indigo-500 rounded-lg shadow-md hover:bg-indigo-600 transition duration-150"
         >
-          Odaberi
+          Select
         </button>
       </div>
     </div>

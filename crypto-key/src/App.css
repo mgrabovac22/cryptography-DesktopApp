@@ -254,7 +254,7 @@ input[type="text"],
 input[type="password"],
 input[type="number"],
 textarea {
-  width: 100%;
+  width: 95%;
   padding: 0.7rem 1rem;
   border: 1px solid #d1d5db;
   border-radius: 0.75rem;
@@ -365,4 +365,92 @@ select:disabled {
   background-color: #e5e7eb;
   cursor: not-allowed;
   opacity: 0.7;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(30, 41, 59, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+  overflow: hidden;
+  backdrop-filter: blur(5px);
+}
+
+.modal-box {
+  max-width: 90%;
+  width: 380px;
+  background: linear-gradient(160deg, #ffffff, #e0e7ff);
+  border-radius: 16px;
+  padding: 2rem;
+  text-align: center;
+  box-shadow: 0 0 25px rgba(147, 197, 253, 0.5);
+  animation: fadeIn 0.5s ease-out;
+  overflow: hidden;
+}
+
+@keyframes fadeIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.loader {
+  width: 70px;
+  height: 70px;
+  margin: 0 auto 1rem auto;
+  border: 6px solid #dbeafe;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.status-text {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1e3a8a;
+  margin-top: 0.5rem;
+  animation: fadeInText 0.5s ease forwards;
+}
+
+@keyframes fadeInText {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.close-btn {
+  margin-top: 1.5rem;
+  background-color: #2563eb;
+  color: white;
+  font-weight: bold;
+  padding: 0.7rem 1.4rem;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.close-btn:hover {
+  background-color: #1e40af;
+  transform: scale(1.05);
 }
