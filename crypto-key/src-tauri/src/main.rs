@@ -87,8 +87,19 @@ fn main() {
                 .item(&MenuItemBuilder::new("Log data").id("open_logger").build(app)?)
                 .build()?;
 
+            let snow_menu = SubmenuBuilder::new(app, "Snow Control")
+                .item(&MenuItemBuilder::new("Increase Intensity").id("snow_increase").build(app)?)
+                .item(&MenuItemBuilder::new("Decrease Intensity").id("snow_decrease").build(app)?)
+                .item(&MenuItemBuilder::new("Toggle Snow").id("snow_toggle").build(app)?)
+                .build()?;
+
+            let info_menu = SubmenuBuilder::new(app, "Info")
+                .item(&MenuItemBuilder::new("About App").id("show_about").build(app)?)
+                .item(&MenuItemBuilder::new("Developer").id("show_dev").build(app)?)
+                .build()?;
+
             MenuBuilder::new(app)
-                .items(&[&view_menu])
+                .items(&[&view_menu, &snow_menu, &info_menu])
                 .build()
         })
 
@@ -99,6 +110,21 @@ fn main() {
                 }
                 "open_logger" => {
                     let _ = app.emit("menu-open-logger", ());
+                }
+                "snow_increase" => {
+                    let _ = app.emit("snow-increase", ());
+                }
+                "snow_decrease" => {
+                    let _ = app.emit("snow-decrease", ());
+                }
+                "snow_toggle" => {
+                    let _ = app.emit("snow-toggle", ());
+                }
+                "show_about" => {
+                    let _ = app.emit("menu-open-about", ());
+                }
+                "show_dev" => {
+                    let _ = app.emit("menu-open-developer", ());
                 }
                 _ => {}
             }
