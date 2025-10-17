@@ -10,7 +10,7 @@ import { StatusModal } from "./components/shared/StatusModal";
 
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'keys' | 'symmetric' | 'asymmetric' | 'signature'>('keys');
-  const [resultMessage, setResultMessage] = useState("");
+  const [, setResultMessage] = useState("");
   const [inputPath, setInputPath] = useState("");
   const [outputPath, setOutputPath] = useState("");
   const [signaturePath, setSignaturePath] = useState("");

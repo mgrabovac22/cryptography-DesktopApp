@@ -10,7 +10,7 @@ use tauri::Manager;
 use tauri::AppHandle;
 
 use super::keys::{load_private_key, load_public_key}; 
-
+use crate::logger::logger::write_log_entry;
 
 fn calculate_digest(path: &Path) -> Result<Vec<u8>, String> {
     let mut file = fs::File::open(path)
@@ -24,6 +24,8 @@ fn calculate_digest(path: &Path) -> Result<Vec<u8>, String> {
 }
 
 pub fn calculate_digest_and_save(app_handle: &AppHandle, input_path: &str) -> Result<String, String> {
+    write_log_entry(app_handle, &format!("Calculating digest for file: {}", input_path)).ok();
+
     let digest = calculate_digest(Path::new(input_path))?;
     let digest_hex = hex::encode(digest);
 
@@ -39,13 +41,15 @@ pub fn calculate_digest_and_save(app_handle: &AppHandle, input_path: &str) -> Re
     fs::write(&digest_path, digest_hex)
         .map_err(|e| format!("Error saving digest file: {}", e))?;
 
-    Ok(format!(
-        "Digest successfully created and saved to: {}",
-        digest_path.display()
-    ))
+    let success_msg = format!("Digest successfully created and saved to: {}", digest_path.display());
+    write_log_entry(app_handle, &success_msg).ok();
+
+    Ok(success_msg)
 }
 
 pub fn digitally_sign(app_handle: &AppHandle, input_file_path: &str) -> Result<String, String> {
+    write_log_entry(app_handle, &format!("Starting digital signing for file: {}", input_file_path)).ok();
+
     let base_path = app_handle
         .path()
         .resolve("keys", tauri::path::BaseDirectory::AppData)
@@ -76,19 +80,19 @@ pub fn digitally_sign(app_handle: &AppHandle, input_file_path: &str) -> Result<S
     fs::write(&signature_path, &signature_base64)
         .map_err(|e| format!("Error saving digital signature: {}", e))?;
 
-    Ok(format!(
-        "Signature successfully created and saved to: {}",
-        signature_path.display()
-    ))
+    let success_msg = format!("Signature successfully created and saved to: {}", signature_path.display());
+    write_log_entry(app_handle, &success_msg).ok();
+
+    Ok(success_msg)
 }
 
 pub fn verify_signature(app_handle: &tauri::AppHandle, file_path: &str, signature_path: &str) -> Result<bool, String> {
-    
+    write_log_entry(app_handle, &format!("Verifying signature for file: {}", file_path)).ok();
+
     let app_data_dir = app_handle.path().app_data_dir()
         .map_err(|e| format!("Error opening app data directory: {}", e))?;
 
     let pub_key_path = app_data_dir.join("keys").join("public_key.txt");
-    
     let public_key = load_public_key(pub_key_path.to_str().unwrap_or_default())?;
 
     let sig_full_path = app_data_dir.join(signature_path);
@@ -106,12 +110,21 @@ pub fn verify_signature(app_handle: &tauri::AppHandle, file_path: &str, signatur
     let verifying_key = VerifyingKey::<Sha256>::new(public_key);
 
     match verifying_key.verify(&digest_from_file, &signature) {
-        Ok(_) => Ok(true),
-        Err(e) => Err(format!("Signature INVALID: The file was modified or the signature is fraudulent. (Error: {})", e)),
+        Ok(_) => {
+            write_log_entry(app_handle, "Signature verification SUCCESSFUL").ok();
+            Ok(true)
+        },
+        Err(e) => {
+            let msg = format!("Signature INVALID: The file was modified or the signature is fraudulent. (Error: {})", e);
+            write_log_entry(app_handle, &msg).ok();
+            Err(msg)
+        },
     }
 }
 
 pub fn list_signatures(app_handle: &AppHandle) -> Result<Vec<String>, String> {
+    write_log_entry(app_handle, "Listing all digital signatures").ok();
+
     let sig_dir = app_handle
         .path()
         .resolve("signature", tauri::path::BaseDirectory::AppData)
@@ -136,6 +149,7 @@ pub fn list_signatures(app_handle: &AppHandle) -> Result<Vec<String>, String> {
     }
 
     signatures.sort();
+    write_log_entry(app_handle, &format!("Found {} signature(s)", signatures.len())).ok();
 
     Ok(signatures)
 }
