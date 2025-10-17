@@ -56,12 +56,10 @@ export const KeysTab: React.FC<KeysTabProps> = ({ setResultMessage }) => {
 
       {isModalOpen && (
         <div className="absolute inset-0 z-50 flex justify-center items-center">
-          {/* Tamni overlay */}
           <div
             className="absolute inset-0 bg-black bg-opacity-30"
             onClick={() => setIsModalOpen(false)}
           />
-          {/* Modal */}
           <div className="relative bg-white rounded-xl p-6 w-full max-w-md shadow-lg z-10 flex flex-col h-[600px]">
             <h3 className="text-lg font-bold mb-4">Select Key to View</h3>
 
