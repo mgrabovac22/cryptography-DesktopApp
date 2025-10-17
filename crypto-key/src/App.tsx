@@ -1,99 +1,27 @@
-import React, { useState } from "react";
-import "./App.css";
+import React, { useEffect, useState } from "react";
+import { listen } from "@tauri-apps/api/event";
 import { Snowfall } from "./components/shared/Snowfall";
-import { TabButton } from "./components/shared/TabButton";
-import { SymmetricTab } from "./components/tabs/SymmetricTab";
-import { KeysTab } from "./components/tabs/KeysTab";
-import { AsymmetricTab } from "./components/tabs/AsymmetricTab";
-import { SignatureTab } from "./components/tabs/SignatureTab";
-import { StatusModal } from "./components/shared/StatusModal";
+import { LoggerView } from "./components/views/react/LoggerView";
+import { AppView } from "./components/views/react/AppView";
 
 const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'keys' | 'symmetric' | 'asymmetric' | 'signature'>('keys');
-  const [, setResultMessage] = useState("");
-  const [inputPath, setInputPath] = useState("");
-  const [outputPath, setOutputPath] = useState("");
-  const [signaturePath, setSignaturePath] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalMessage, setModalMessage] = useState("");
+  const [activeView, setActiveView] = useState<"app" | "logger">("app");
 
-  const showModalMessage = (msg: string) => {
-    setModalMessage(msg);
-    setIsModalOpen(true);
-  };
+  useEffect(() => {
+    const unlistenApp = listen("menu-open-app", () => setActiveView("app"));
+    const unlistenLogger = listen("menu-open-logger", () => setActiveView("logger"));
 
-  const getOutputPath = (originalPath: string, suffix: string) => {
-    if (!originalPath) return "output.bin";
-    const parts = originalPath.split(".");
-    const base = parts.slice(0, -1).join(".");
-    return `${base}_${suffix}.bin`;
-  };
+    return () => {
+      unlistenApp.then(f => f());
+      unlistenLogger.then(f => f());
+    };
+  }, []);
 
   return (
-    <div className="app-container">
+    <>
       <Snowfall />
-      <div className="crypto-card">
-        <h1 className="crypto-title">❄ CRYPTO KEY ❄</h1>
-        <p className="crypto-subtitle">Data security is cool!</p>
-
-        <div className="tabs-container mb-6 flex w-full">
-          <TabButton tabId="keys" activeTab={activeTab} setActiveTab={(id) => { setActiveTab(id); setResultMessage(''); }}>
-            Keys
-          </TabButton>
-          <TabButton tabId="symmetric" activeTab={activeTab} setActiveTab={(id) => { setActiveTab(id); setResultMessage(''); }}>
-            Symmetric
-          </TabButton>
-          <TabButton tabId="asymmetric" activeTab={activeTab} setActiveTab={(id) => { setActiveTab(id); setResultMessage(''); }}>
-            Asymmetric
-          </TabButton>
-          <TabButton tabId="signature" activeTab={activeTab} setActiveTab={(id) => { setActiveTab(id); setResultMessage(''); }}>
-            Signature
-          </TabButton>
-        </div>
-
-        <div className="inner-box">
-          {activeTab === "keys" && <KeysTab setResultMessage={showModalMessage} />}
-
-          {activeTab === "symmetric" && (
-            <SymmetricTab
-              inputPath={inputPath}
-              setInputPath={setInputPath}
-              outputPath={outputPath}
-              setOutputPath={setOutputPath}
-              setResultMessage={showModalMessage}
-              getOutputPath={getOutputPath}
-            />
-          )}
-
-          {activeTab === "asymmetric" && (
-            <AsymmetricTab
-              inputPath={inputPath}
-              setInputPath={setInputPath}
-              outputPath={outputPath}
-              setOutputPath={setOutputPath}
-              setResultMessage={showModalMessage}
-              getOutputPath={getOutputPath}
-            />
-          )}
-
-          {activeTab === "signature" && (
-            <SignatureTab
-              inputPath={inputPath}
-              setInputPath={setInputPath}
-              signaturePath={signaturePath}
-              setSignaturePath={setSignaturePath}
-              setResultMessage={showModalMessage}
-            />
-          )}
-        </div>
-      </div>
-
-      <StatusModal
-          isOpen={isModalOpen}
-          message={modalMessage}
-          onClose={() => setIsModalOpen(false)}
-      />
-    </div>
+      {activeView === "app" ? <div className="app-container"><AppView /></div> : <div className="logger-container"><LoggerView /></div>}
+    </>
   );
 };
 

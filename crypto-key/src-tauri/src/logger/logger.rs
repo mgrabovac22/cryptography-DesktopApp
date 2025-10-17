@@ -57,6 +57,7 @@ pub fn read_logs(app_handle: &AppHandle) -> Result<String, String> {
         .path()
         .app_data_dir()
         .map_err(|e| format!("Error getting log dir: {}", e))?
+        .join("logger")
         .join(LOG_FILE_NAME);
 
     std::fs::read_to_string(&log_path)

@@ -4,6 +4,10 @@ mod crypto;
 mod logger;
 
 use crypto::{keys, signature, crypting};
+use tauri::{
+    menu::{MenuBuilder, MenuItemBuilder, SubmenuBuilder},
+    Emitter,
+};
 
 #[tauri::command]
 fn generate_keys(app_handle: tauri::AppHandle) -> Result<String, String> {
@@ -61,6 +65,30 @@ fn main() {
             logger::logger::init_logger(&app.handle());
             Ok(())
         })
+
+        .menu(|app| {
+            let view_menu = SubmenuBuilder::new(app, "View")
+                .item(&MenuItemBuilder::new("App").id("open_app").build(app)?)
+                .item(&MenuItemBuilder::new("Log data").id("open_logger").build(app)?)
+                .build()?;
+
+            MenuBuilder::new(app)
+                .items(&[&view_menu])
+                .build()
+        })
+
+        .on_menu_event(|app, event| {
+            match event.id().as_ref() {
+                "open_app" => {
+                    let _ = app.emit("menu-open-app", ());
+                }
+                "open_logger" => {
+                    let _ = app.emit("menu-open-logger", ());
+                }
+                _ => {}
+            }
+        })
+
         .invoke_handler(tauri::generate_handler![
             generate_keys,
             calculate_digest_and_save,
