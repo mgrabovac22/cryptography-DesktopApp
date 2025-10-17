@@ -13,9 +13,10 @@
 .snowflake {
   position: absolute;
   top: -10px;
-  color: rgb(176, 231, 238);
+  color: #61a0ec;
   font-size: 1em;
   opacity: 0.8;
+  pointer-events: none;
   animation-name: fall;
   animation-timing-function: linear;
   animation-iteration-count: infinite;
@@ -75,7 +76,7 @@
   text-align: center;
   font-size: 2.5rem;
   font-weight: 900;
-  background: linear-gradient(to right, #3b82f6, #60a5fa, #93c5fd);
+  background: linear-gradient(to right, #2474f5, #61a0ec, #a9cef8);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   margin-bottom: 0.5rem;

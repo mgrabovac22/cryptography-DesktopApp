@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-export const Snowfall: React.FC = () => {
+export const SnowfallCustom: React.FC = () => {
   const [flakes, setFlakes] = useState<React.ReactElement[]>([]);
 
   useEffect(() => {
