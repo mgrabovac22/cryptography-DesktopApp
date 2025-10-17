@@ -66,7 +66,7 @@ pub fn symmetric_encrypt(app_handle: &AppHandle, input_path: String, output_path
             msg
         })?;
 
-    let success_msg = format!("✅ Symmetric encryption completed successfully. Output: {}", output_path);
+    let success_msg = format!("✅ Symmetric encryption completed successfully.");
     write_log_entry(app_handle, &success_msg).ok();
 
     Ok(success_msg)
@@ -129,7 +129,7 @@ pub fn symmetric_decrypt(app_handle: &AppHandle, input_path: &str, output_path: 
             msg
         })?;
 
-    let success_msg = format!("✅ Symmetric decryption completed successfully. Output: {}", output_path);
+    let success_msg = format!("✅ Symmetric decryption completed successfully.");
     write_log_entry(app_handle, &success_msg).ok();
 
     Ok(success_msg)
@@ -170,7 +170,7 @@ pub fn asymmetric_encrypt(app_handle: &AppHandle, input_path: &str, output_path:
             msg
         })?;
 
-    let success_msg = format!("✅ Asymmetric encryption completed successfully. Output: {}", output_path);
+    let success_msg = format!("✅ Asymmetric encryption completed successfully.");
     write_log_entry(app_handle, &success_msg).ok();
 
     Ok(success_msg)
@@ -209,7 +209,7 @@ pub fn asymmetric_decrypt(app_handle: &AppHandle, input_path: &str, output_path:
             msg
         })?;
 
-    let success_msg = format!("✅ Asymmetric decryption completed successfully. Output: {}", output_path);
+    let success_msg = format!("✅ Asymmetric decryption completed successfully.");
     write_log_entry(app_handle, &success_msg).ok();
 
     Ok(success_msg)

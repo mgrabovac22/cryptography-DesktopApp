@@ -65,7 +65,7 @@ pub fn generate_and_save(app_handle: AppHandle) -> Result<String, String> {
             msg
         })?;
 
-    let success_msg = format!("✅ Keys successfully generated and saved to: {}", base_path.display());
+    let success_msg = format!("✅ Keys successfully generated and saved.");
     write_log_entry(&app_handle, &success_msg).ok();
 
     Ok(success_msg)
@@ -106,4 +106,48 @@ pub fn load_secret_key(path: &str) -> Result<Key<Aes256Gcm>, String> {
     }
 
     Ok(*Key::<Aes256Gcm>::from_slice(&key_bytes))
+}
+
+fn keys_base_path(app_handle: &AppHandle) -> Result<std::path::PathBuf, String> {
+    app_handle
+        .path()
+        .resolve("keys", BaseDirectory::AppData)
+        .map_err(|e| {
+            let msg = format!("Error resolving keys directory: {}", e);
+            write_log_entry(app_handle, &msg).ok();
+            msg
+        })
+}
+
+pub fn load_private_key_for_display(app_handle: &AppHandle) -> Result<String, String> {
+    let path = keys_base_path(app_handle)?.join("private_key.txt");
+    let pem = fs::read_to_string(&path)
+        .map_err(|e| {
+            let msg = format!("Error reading private key for display: {}", e);
+            write_log_entry(app_handle, &msg).ok();
+            msg
+        })?;
+    Ok(pem)
+}
+
+pub fn load_public_key_for_display(app_handle: &AppHandle) -> Result<String, String> {
+    let path = keys_base_path(app_handle)?.join("public_key.txt");
+    let pem = fs::read_to_string(&path)
+        .map_err(|e| {
+            let msg = format!("Error reading public key for display: {}", e);
+            write_log_entry(app_handle, &msg).ok();
+            msg
+        })?;
+    Ok(pem)
+}
+
+pub fn load_secret_key_for_display(app_handle: &AppHandle) -> Result<String, String> {
+    let path = keys_base_path(app_handle)?.join("secret_key.txt");
+    let key_base64 = fs::read_to_string(&path)
+        .map_err(|e| {
+            let msg = format!("Error reading secret key for display: {}", e);
+            write_log_entry(app_handle, &msg).ok();
+            msg
+        })?;
+    Ok(key_base64.trim().to_string())
 }

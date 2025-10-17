@@ -41,7 +41,7 @@ pub fn calculate_digest_and_save(app_handle: &AppHandle, input_path: &str) -> Re
     fs::write(&digest_path, digest_hex)
         .map_err(|e| format!("Error saving digest file: {}", e))?;
 
-    let success_msg = format!("Digest successfully created and saved to: {}", digest_path.display());
+    let success_msg = format!("✅ Digest successfully created and saved.");
     write_log_entry(app_handle, &success_msg).ok();
 
     Ok(success_msg)
@@ -80,7 +80,7 @@ pub fn digitally_sign(app_handle: &AppHandle, input_file_path: &str) -> Result<S
     fs::write(&signature_path, &signature_base64)
         .map_err(|e| format!("Error saving digital signature: {}", e))?;
 
-    let success_msg = format!("Signature successfully created and saved to: {}", signature_path.display());
+    let success_msg = format!("✅ Signature successfully created and saved.");
     write_log_entry(app_handle, &success_msg).ok();
 
     Ok(success_msg)
@@ -111,7 +111,7 @@ pub fn verify_signature(app_handle: &tauri::AppHandle, file_path: &str, signatur
 
     match verifying_key.verify(&digest_from_file, &signature) {
         Ok(_) => {
-            write_log_entry(app_handle, "Signature verification SUCCESSFUL").ok();
+            write_log_entry(app_handle, "✅ Signature verification SUCCESSFUL").ok();
             Ok(true)
         },
         Err(e) => {

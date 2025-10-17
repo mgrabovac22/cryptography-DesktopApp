@@ -59,6 +59,21 @@ fn read_logs_command(app_handle: tauri::AppHandle) -> Result<String, String> {
     logger::logger::read_logs(&app_handle)
 }
 
+#[tauri::command]
+fn get_private_key(app_handle: tauri::AppHandle) -> Result<String, String> {
+    keys::load_private_key_for_display(&app_handle)
+}
+
+#[tauri::command]
+fn get_public_key(app_handle: tauri::AppHandle) -> Result<String, String> {
+    keys::load_public_key_for_display(&app_handle)
+}
+
+#[tauri::command]
+fn get_secret_key(app_handle: tauri::AppHandle) -> Result<String, String> {
+    keys::load_secret_key_for_display(&app_handle)
+}
+
 fn main() {
     tauri::Builder::default()
         .setup(|app| {
@@ -99,7 +114,10 @@ fn main() {
             asymmetric_encrypt,
             asymmetric_decrypt,
             list_signatures_cmd,
-            read_logs_command
+            read_logs_command,
+            get_private_key,
+            get_public_key,
+            get_secret_key
         ])
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
