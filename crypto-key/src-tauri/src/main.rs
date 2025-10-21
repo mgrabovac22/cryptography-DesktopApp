@@ -8,7 +8,7 @@ use commands::{
     keys::{generate_keys, get_private_key, get_public_key, get_secret_key},
     signature::{calculate_digest_and_save, digitally_sign, verify_signature, list_signatures_cmd},
     crypting::{symmetric_encrypt, symmetric_decrypt, asymmetric_encrypt, asymmetric_decrypt},
-    logger::read_logs_command,
+    logger::{read_logs_command, get_formatted_logs_command},
 };
 use tauri::{
     Manager,
@@ -69,7 +69,8 @@ fn main() {
             symmetric_decrypt,
             asymmetric_encrypt,
             asymmetric_decrypt,
-            read_logs_command
+            read_logs_command,
+            get_formatted_logs_command
         ])
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
