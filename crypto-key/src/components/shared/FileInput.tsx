@@ -33,7 +33,7 @@ export const FileInput: React.FC<FileInputProps> = ({ label, path, setter, setRe
           onClick={selectFile}
           className="px-4 py-2 text-sm font-semibold text-white bg-indigo-500 rounded-lg shadow-md hover:bg-indigo-600 transition duration-150"
         >
-          Select
+          Browse
         </button>
       </div>
     </div>

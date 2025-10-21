@@ -48,7 +48,7 @@ export const StatusModal: React.FC<StatusModalProps> = ({ isOpen, message, onClo
 
         {isFinished && (
           <button className="close-btn" onClick={onClose}>
-            Zatvori
+            Close
           </button>
         )}
       </div>

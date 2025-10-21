@@ -21,15 +21,16 @@ export const SignatureTab: React.FC<SignatureTabProps> = ({
   const [signatures, setSignatures] = useState<string[]>([]);
   const [selectedSignature, setSelectedSignature] = useState("");
 
+  const fetchSignatures = async () => {
+    try {
+      const result = await invoke<string[]>("list_signatures_cmd");
+      setSignatures(result);
+    } catch (err) {
+      console.error("Error loading signatures:", err);
+    }
+  };
+  
   useEffect(() => {
-    const fetchSignatures = async () => {
-      try {
-        const result = await invoke<string[]>("list_signatures_cmd");
-        setSignatures(result);
-      } catch (err) {
-        console.error("Error loading signatures:", err);
-      }
-    };
     fetchSignatures();
   }, []);
 
@@ -50,6 +51,7 @@ export const SignatureTab: React.FC<SignatureTabProps> = ({
     try {
       const res = await invoke<string>("digitally_sign", { filePath: inputPath });
       setResultMessage(res);
+      fetchSignatures();
     } catch (err: any) {
       setResultMessage(`ERROR: ${err}`);
     }
