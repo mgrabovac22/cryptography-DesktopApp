@@ -5,6 +5,23 @@ interface KeysTabProps {
   setResultMessage: (msg: string) => void;
 }
 
+const FolderOpenIcon = () => (
+    <svg 
+        xmlns="http://www.w3.org/2000/svg" 
+        width="24" 
+        height="24" 
+        viewBox="0 0 24 24" 
+        fill="none" 
+        stroke="currentColor" 
+        strokeWidth="2" 
+        strokeLinecap="round" 
+        strokeLinejoin="round" 
+        className="w-6 h-6 mr-2"
+    >
+        <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 11.93 2H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2z"></path>
+    </svg>
+);
+
 export const KeysTab: React.FC<KeysTabProps> = ({ setResultMessage }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedKey, setSelectedKey] = useState<'private' | 'public' | 'secret'>('private');
@@ -33,6 +50,16 @@ export const KeysTab: React.FC<KeysTabProps> = ({ setResultMessage }) => {
     }
   };
 
+  const openKeysDirectory = async () => {
+    setResultMessage('Opening keys directory...');
+    try {
+      await invoke('open_keys_directory');
+      setResultMessage('Keys directory opened successfully.');
+    } catch (err: any) {
+      setResultMessage(`ERROR: ${err}`);
+    }
+  };
+
   return (
     <div className="space-y-6 relative">
       <h2 className="text-xl font-semibold text-gray-800">Keys Management</h2>
@@ -47,12 +74,22 @@ export const KeysTab: React.FC<KeysTabProps> = ({ setResultMessage }) => {
         Generate and Save All Keys
       </button>
 
-      <button
-        onClick={openKeyModal}
-        className="w-full py-3 text-lg font-bold text-white bg-blue-500 rounded-xl shadow-lg hover:bg-blue-600 transition duration-150"
-      >
-        View Keys
-      </button>
+      <div className="flex space-x-4">
+          <button
+            onClick={openKeyModal}
+            className="flex-1 py-3 text-lg font-bold text-white bg-blue-500 rounded-xl shadow-lg hover:bg-blue-600 transition duration-150"
+          >
+            View Keys
+          </button>
+          
+          <button
+            onClick={openKeysDirectory}
+            title="Open Keys Directory"
+            className="flex items-center justify-center w-20 py-3 text-white bg-indigo-500 rounded-xl shadow-lg hover:bg-indigo-600 transition duration-150"
+          >
+             <FolderOpenIcon />
+          </button>
+      </div>
 
       {isModalOpen && (
         <div className="absolute inset-0 z-50 flex justify-center items-center">

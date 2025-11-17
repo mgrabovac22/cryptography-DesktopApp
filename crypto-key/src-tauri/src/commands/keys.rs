@@ -19,3 +19,8 @@ pub fn get_public_key(app_handle: AppHandle) -> Result<String, String> {
 pub fn get_secret_key(app_handle: AppHandle) -> Result<String, String> {
     crate::crypto::keys::load_secret_key_for_display(&app_handle)
 }
+
+#[tauri::command]
+pub fn open_keys_directory(app_handle: AppHandle) -> Result<(), String> {
+    crate::crypto::keys::open_keys_dir(&app_handle)
+}

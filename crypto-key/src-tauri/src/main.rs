@@ -5,7 +5,7 @@ mod crypto;
 mod logger;
 
 use commands::{
-    keys::{generate_keys, get_private_key, get_public_key, get_secret_key},
+    keys::{generate_keys, get_private_key, get_public_key, get_secret_key, open_keys_directory},
     signature::{calculate_digest_and_save, digitally_sign, verify_signature, list_signatures_cmd},
     crypting::{symmetric_encrypt, symmetric_decrypt, asymmetric_encrypt, asymmetric_decrypt},
     logger::{read_logs_command, get_formatted_logs_command},
@@ -70,10 +70,12 @@ fn main() {
             asymmetric_encrypt,
             asymmetric_decrypt,
             read_logs_command,
-            get_formatted_logs_command
+            get_formatted_logs_command,
+            open_keys_directory
         ])
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_shell::init())
         .run(tauri::generate_context!())
         .expect("Error while running the Tauri application.");
 }
