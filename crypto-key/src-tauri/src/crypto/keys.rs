@@ -6,7 +6,7 @@ use aes_gcm::{KeyInit, Aes256Gcm, Key};
 use base64::{Engine as _, engine::general_purpose};
 use tauri::{AppHandle, Manager, path::BaseDirectory};
 
-use tauri_plugin_shell::ShellExt;
+use tauri_plugin_opener::OpenerExt;
 
 use crate::logger::logger::write_log_entry;
 
@@ -164,13 +164,19 @@ pub fn load_secret_key_for_display(app_handle: &AppHandle) -> Result<String, Str
 pub fn open_keys_dir(app_handle: &AppHandle) -> Result<(), String> {
     let path = keys_base_path(app_handle)?;
     
-    write_log_entry(app_handle, &format_log("Open Directory", &[("Path", &path.to_string_lossy())])).ok();
+    write_log_entry(
+        app_handle,
+        &format_log("Open Directory", &[("Path", &path.to_string_lossy())])
+    ).ok();
 
     let path_str = path.to_str().ok_or_else(|| "Invalid path format".to_string())?;
 
-    match app_handle.shell().open(path_str, None) { 
+    match app_handle.opener().open_path(path_str, Option::<String>::None) {
         Ok(_) => {
-            write_log_entry(app_handle, &format_log("Open Directory Success", &[("Path", &path.to_string_lossy())])).ok();
+            write_log_entry(
+                app_handle,
+                &format_log("Open Directory Success", &[("Path", &path.to_string_lossy())])
+            ).ok();
             Ok(())
         },
         Err(e) => {
